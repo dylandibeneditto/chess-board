@@ -56,6 +56,7 @@ class ChessBoard:
         added_piece = None
         removed_pos = None
         added_pos = None
+        capture_pos = None
 
         for r in range(8):
             for c in range(8):
@@ -64,16 +65,21 @@ class ChessBoard:
                         # A piece was removed
                         removed_piece = self.last_grid[r][c]
                         removed_pos = (r, c)
+                    elif self.last_grid[r][c] is not None and grid[r][c] is not None:
+                        # A capture occurred
+                        capture_pos = (r, c)
+                        added_piece = grid[r][c]
+                        added_pos = (r, c)
                     elif self.last_grid[r][c] is None and grid[r][c] is not None:
                         # A piece was added
                         added_piece = grid[r][c]
                         added_pos = (r, c)
 
-        # Ensure we detected a valid move
-        if removed_piece and added_piece and removed_pos and added_pos:
+        # Ensure we detected a valid move or capture
+        if removed_piece and added_piece and removed_pos and (added_pos or capture_pos):
             # Convert positions to chess notation
             from_square = self.__point_to_chess(removed_pos)
-            to_square = self.__point_to_chess(added_pos)
+            to_square = self.__point_to_chess(capture_pos if capture_pos else added_pos)
 
             # Make the move on the chess board
             move = chess.Move.from_uci(f"{from_square}{to_square}")
